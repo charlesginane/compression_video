@@ -19,6 +19,7 @@ class Image:
         self.frame_1 = None
         self.frame_2 = None
         self.ppm = None
+        self.decentrelase = False
 
 
     def getUV(self, image):
@@ -56,27 +57,35 @@ class Image:
         U, V = self.getUV(self.pgm)
         self.frame_1 = np.zeros((self.rows // 2, self.pgm.shape[1], 3))
         self.frame_2 = np.zeros((self.rows // 2, self.pgm.shape[1], 3))
-        for j in range(self.pgm.shape[1]):
-            n_1 = 0
-            n_2 = 0
-            for i in range(0, self.rows):
-                if i % 2 == 0:
-                    self.frame_1[n_1, j, 0] = self.pgm[i, j]
-                    self.frame_1[n_1, j, 1] = U[i, j]
-                    self.frame_1[n_1, j, 2] = V[i, j]
-                    n_1 += 1
-                else:
-                    self.frame_2[n_2, j, 0] = self.pgm[i, j]
-                    self.frame_2[n_2, j, 1] = U[i, j]
-                    self.frame_2[n_2, j, 2] = V[i, j]
-                    n_2 += 1
-        self.ppm = cv2.cvtColor(self.frame_1.astype(np.uint8), cv2.COLOR_YUV2RGB)
+        if self.decentrelase:
+            for j in range(self.pgm.shape[1]):
+                n_1 = 0
+                n_2 = 0
+                for i in range(0, self.rows):
+                    if i % 2 == 0:
+                        self.frame_1[n_1, j, 0] = self.pgm[i, j]
+                        self.frame_1[n_1, j, 1] = U[i, j]
+                        self.frame_1[n_1, j, 2] = V[i, j]
+                        n_1 += 1
+                    else:
+                        self.frame_2[n_2, j, 0] = self.pgm[i, j]
+                        self.frame_2[n_2, j, 1] = U[i, j]
+                        self.frame_2[n_2, j, 2] = V[i, j]
+                        n_2 += 1
+        else:
+            self.frame_1 = np.zeros((self.rows, self.pgm.shape[1], 3))
+            for j in range(self.pgm.shape[1]):
+                for i in range(0, self.rows):
+                    self.frame_1[i, j, 0] = self.pgm[i, j]
+                    self.frame_1[i, j, 1] = U[i, j]
+                    self.frame_1[i, j, 2] = V[i, j]
+        self.ppm = cv2.cvtColor(self.frame_1.astype(np.uint8), cv2.COLOR_YUV2BGR)
 
 
     def plot(self):
         plt.imshow(self.ppm)
-        plt.show(block=False)
+        plt.show()
         print("sncf")
 
     def save(self, name_file='out.ppm'):
-        self.ppm.save(name_file)
+         cv2.imwrite(name_file, self.ppm)
