@@ -5,6 +5,7 @@ import tempfile
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
+import re
 
 
 def usage():
@@ -24,10 +25,19 @@ def animate(list_images, fps=25, save=False):
         plt.show()
 
 
+def read_log(log_file):
+    lines = []
+    with open(log_file, 'r+') as f:
+        lines = f.readlines()
+    for i in range(len(lines)):
+        lines[i] = lines[i].replace('\n', '')
+    return lines
+
+
 def __main__():
     save = False
     image_file = None
-    log_file = None
+    log_file = "log.txt"
     fps = 25
     if '-s' in sys.argv:
         save = True
@@ -56,10 +66,28 @@ def __main__():
 
         list_frame = dec.get_list_of_frame()
         print('got %d frames' % (len(list_frame)))
-
+        lines = read_log(log_file)
+        line = 0
         list_image = []
+        if re.match('Frame period:*', lines[0]):
+            fps = int(float(lines[0].split(':')[-1]))
+            print('new :', fps)
+            line += 1
+
         for frame in list_frame:
-            im = lib.Image('%s/%d.pgm' % (tmp_dir, frame))
+            first = 0
+            if re.match('Frame period:*', lines[line]):
+                line += 1
+            if lines[line] == "PIC_FLAG_TOP_FIELD_FIRST":
+                first = 1
+                line += 1
+            elif lines[line] == "PIC_FLAG_REPEAT_FIRST_FIELD":
+                first = 2
+                line += 1
+            elif lines[line] == "PIC_FLAG_PROGRESSIVE_FRAME":
+                line += 1
+
+            im = lib.Image('%s/%d.pgm' % (tmp_dir, frame), first=first)
             im.convert()
             list_image.append(im.ppm)
         print(len(list_image))
