@@ -22,66 +22,43 @@ class Image:
     def getUV(self, image):
         U_1 = image[self.rows:image.shape[0],0:self.cols]
         U = np.zeros((self.rows, image.shape[1]))
-        l = 0
-        for j in range(U_1.shape[0]):
-            c = 0
-            for i in range(U_1.shape[1]):
-                U[l, c] = U_1[j, i]
-                c += 1
-                U[l, c] = U_1[j, i]
-                c += 1
-            for i in range(image.shape[1]):
-                U[l+1, i] = U[l, i]
-            l += 2
+        U[::2,::2] = U_1[:,:]
+        U[1::2,::2] = U_1[:,:]
+        U[::2,1::2] = U_1[:,:]
+        U[1::2,1::2] = U_1[:,:]
 
         V_1 = image[self.rows:image.shape[0],self.cols:image.shape[1]]
         V = np.zeros((self.rows, image.shape[1]))
-        l = 0
-        for j in range(V_1.shape[0]):
-            c = 0
-            for i in range(V_1.shape[1]):
-                V[l, c] = V_1[j, i]
-                c += 1
-                V[l, c] = V_1[j, i]
-                c += 1
-            for i in range(image.shape[1]):
-                V[l+1, i] = V[l, i]
-            l += 2
+        V[::2,::2] = V_1[:,:]
+        V[1::2,::2] = V_1[:,:]
+        V[::2,1::2] = V_1[:,:]
+        V[1::2,1::2] = V_1[:,:]
         return U, V
 
+    def mean_frame(self):
+        for i in range(0, self.frame_1.shape[0]):
+            if i % 2 == 0:
+                if i == 0:
+                    continue
+                self.frame_2[i] = (self.frame_2[i - 1] + self.frame_2[i + 1]) // 2
+            else:
+                if i + 1 == self.frame_1.shape[0]:
+                    continue
+                self.frame_1[i] = (self.frame_1[i - 1] + self.frame_1[i + 1]) // 2
 
     def convert(self):
         U, V = self.getUV(self.pgm)
         self.frame_1 = np.zeros((self.rows, self.pgm.shape[1], 3))
         self.frame_2 = np.zeros((self.rows, self.pgm.shape[1], 3))
         if self.first:
-            print(self.first)
-            for j in range(self.pgm.shape[1]):
-                n_1 = 0
-                n_2 = 0
-                for i in range(0, self.rows):
-                    if i % 2 == 0:
-                        self.frame_1[n_1, j, 0] = self.pgm[i, j]
-                        self.frame_1[n_1, j, 1] = U[i, j]
-                        self.frame_1[n_1, j, 2] = V[i, j]
-                        n_1 += 1
-                        self.frame_1[n_1, j, 0] = self.pgm[i, j]
-                        self.frame_1[n_1, j, 1] = U[i, j]
-                        self.frame_1[n_1, j, 2] = V[i, j]
-                        n_1 += 1
-                    else:
-                        self.frame_2[n_2, j, 0] = self.pgm[i, j]
-                        self.frame_2[n_2, j, 1] = U[i, j]
-                        self.frame_2[n_2, j, 2] = V[i, j]
-                        n_2 += 1
-                        self.frame_2[n_2, j, 0] = self.pgm[i, j]
-                        self.frame_2[n_2, j, 1] = U[i, j]
-                        self.frame_2[n_2, j, 2] = V[i, j]
-                        n_2 += 1
-                if self.first == 2:
-                    t = self.frame_1
-                    self.frame_1 = self.frame_2
-                    self.frame_2 = t
+            self.frame_1[::2,:,0] =  self.pgm[:self.rows:2,::]
+            self.frame_2[1::2,:,0] =  self.pgm[1:self.rows:2,::]
+            self.frame_1[::2,:,1] =  U[::2,::]
+            self.frame_2[1::2,:,1] =  U[1::2,::]
+            self.frame_1[::2,:,2] =  V[::2,::]
+            self.frame_2[1::2,:,2] =  V[1::2,::]
+
+            self.mean_frame()
 
         else:
             self.frame_1 = np.zeros((self.rows, self.pgm.shape[1], 3))
@@ -90,4 +67,11 @@ class Image:
                     self.frame_1[i, j, 0] = self.pgm[i, j]
                     self.frame_1[i, j, 1] = U[i, j]
                     self.frame_1[i, j, 2] = V[i, j]
-        self.ppm = cv2.cvtColor(self.frame_1.astype(np.uint8), cv2.COLOR_YUV2BGR)
+        self.frame_1 = cv2.cvtColor(self.frame_1.astype(np.uint8), cv2.COLOR_YUV2RGB)
+        self.frame_2 = cv2.cvtColor(self.frame_2.astype(np.uint8), cv2.COLOR_YUV2RGB)
+
+
+        for i in range(self.frame_2.shape[1]):
+             self.frame_2[0,i] = 0
+             self.frame_2[self.frame_2.shape[0] - 1,i] = 0
+             self.frame_1[self.frame_2.shape[0] - 1,i] = 0

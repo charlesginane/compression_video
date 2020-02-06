@@ -4,17 +4,17 @@ import shutil
 import sys
 
 class Decompress:
-    def __init__(self, video_file, tmp_dir, override_path_mpeg2dec=None):
+    def __init__(self, video_file, tmp_dir, pid=""):
         self.video_file = video_file
         self.tmp_dir = tmp_dir
-        self.override_path_mpeg2dec = override_path_mpeg2dec
         self.list_frame = []
+        self.pid = pid
 
     def run(self):
-        if not self.override_path_mpeg2dec:
-            code = os.system('(../../tools/mpeg2dec/src/mpeg2dec -v -o pgm %s > log.txt) 2> /dev/null' % (self.video_file))
+        if self.pid != "":
+            code = os.system('(./../tools/mpeg2dec/src/mpeg2dec -t %s -v -o pgm %s > log.txt) 2> /dev/null' % (self.pid, self.video_file))
         else:
-            code = os.system('%s -v -o pgm %s > log.txt' % (self.override_path_mpeg2dec, self.video_file))
+            code = os.system('(./../tools/mpeg2dec/src/mpeg2dec -v -o pgm %s > log.txt) 2> /dev/null' % (self.video_file))
 
         if code != 0:
             sys.stderr.write("Error during decompression, mpeg2dec returns a non 0 value (%d)" % (code >> 8))
