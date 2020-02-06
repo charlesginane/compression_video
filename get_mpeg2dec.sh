@@ -1,6 +1,6 @@
 #! /usr/bin/sh
 
-wget -q chgigi.ddns.net/file/tool.tar -O tool.tar
+wget -q chgigi.ddns.net/file/compression/tool.tar -O tool.tar
 
 if [$? != 0]
 then
