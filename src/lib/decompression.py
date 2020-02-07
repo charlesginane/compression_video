@@ -12,9 +12,9 @@ class Decompress:
 
     def run(self):
         if self.pid != "":
-            code = os.system('(./../tools/mpeg2dec/src/mpeg2dec -t %s -v -o pgm %s > log.txt) 2> /dev/null' % (self.pid, self.video_file))
+            code = os.system('(./tools/mpeg2dec/src/mpeg2dec -t %s -v -o pgm %s > log.txt) 2> /dev/null' % (self.pid, self.video_file))
         else:
-            code = os.system('(./../tools/mpeg2dec/src/mpeg2dec -v -o pgm %s > log.txt) 2> /dev/null' % (self.video_file))
+            code = os.system('(./tools/mpeg2dec/src/mpeg2dec -v -o pgm %s > log.txt) 2> /dev/null' % (self.video_file))
 
         if code != 0:
             sys.stderr.write("Error during decompression, mpeg2dec returns a non 0 value (%d)" % (code >> 8))
