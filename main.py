@@ -3,14 +3,6 @@ import os
 import sys
 import src.tool
 import src.lib
-import tempfile
-import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.animation as animation
-import re
-import skimage
-import time
-from tqdm import tqdm
 
 
 def usage():
@@ -65,6 +57,10 @@ def __main__():
 
     if '--decompress' in sys.argv:
         # Create the workspace
+        if os.path.exists("workspace"):
+            rep = input("Do you want to reset the directory workspace ?[Y/n]")
+            if rep == "n":
+                exit(0)
         os.system("rm -rf workspace")
         os.system("mkdir workspace")
         os.system("mkdir workspace/res")
