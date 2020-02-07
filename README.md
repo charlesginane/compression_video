@@ -103,6 +103,7 @@ L'application va créer:
 |- get_mpeg2dec.sh        # Script pour obtenir mpeg2dec
 |- main.py                # Le script principale
 |- src/
+|  |- tool.py             # Ce fichier regroupe les fonctions pour notre application
 |  |- lib/
 |     | image.py          # Gestion de l'image et du désentrelacement
 |     | decompression.py  # Wrapper du tool mpeg2dec

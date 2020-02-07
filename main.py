@@ -92,13 +92,5 @@ def __main__():
         src.tool.animate(list_im, fps=fps, save=save)
         exit(0)
 
-    if '--pgm' in sys.argv:
-        image_file = sys.argv[sys.argv.index('--pgm') + 1]
-        sys.argv.remove('--pgm')
-        sys.argv.remove(image_file)
-        im = lib.Image(image_file)
-        im.convert()
-        skimage.io.imsave("save.ppm", im.ppm)
-
 
 __main__()

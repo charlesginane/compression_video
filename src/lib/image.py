@@ -20,6 +20,7 @@ class Image:
 
 
     def getUV(self, image):
+        # Resize U and V channel
         U_1 = image[self.rows:image.shape[0],0:self.cols]
         U = np.zeros((self.rows, image.shape[1]))
         U[::2,::2] = U_1[:,:]
@@ -36,6 +37,7 @@ class Image:
         return U, V
 
     def mean_frame(self):
+        # Apply the desentrelacer
         for i in range(0, self.frame_1.shape[0]):
             if i % 2 == 0:
                 if i == 0:
@@ -51,6 +53,7 @@ class Image:
         self.frame_1 = np.zeros((self.rows, self.pgm.shape[1], 3))
         self.frame_2 = np.zeros((self.rows, self.pgm.shape[1], 3))
         if self.first:
+            # Frame need to be desentrelacer
             self.frame_1[::2,:,0] =  self.pgm[:self.rows:2,::]
             self.frame_2[1::2,:,0] =  self.pgm[1:self.rows:2,::]
             self.frame_1[::2,:,1] =  U[::2,::]
@@ -71,6 +74,7 @@ class Image:
         self.frame_2 = cv2.cvtColor(self.frame_2.astype(np.uint8), cv2.COLOR_YUV2RGB)
 
 
+        # Adding a black line on top of the seconde frame
         for i in range(self.frame_2.shape[1]):
              self.frame_2[0,i] = 0
              self.frame_2[self.frame_2.shape[0] - 1,i] = 0

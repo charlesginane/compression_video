@@ -24,14 +24,17 @@ def animate(len_image, fps=1, save=False):
     im = plt.imshow((skimage.io.imread('workspace/res/frame_0.ppm')), animated=True)
 
     def update(frame):
+        # Update the frame
         im.set_array((skimage.io.imread('workspace/res/frame_%d.ppm' % frame)))
         return im,
 
     ani = animation.FuncAnimation(fig, update, frames=len_image - 1, blit=True, interval=fps, repeat=False)
     if save:
+        # Save mode
         sys.stdout.write("Save the video at out.mp4\n")
         ani.save("out.mp4")
     else:
+        # Display mode
         plt.show()
 
 
